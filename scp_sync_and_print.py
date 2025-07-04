@@ -50,7 +50,7 @@ for file_name in [f.name for f in files_to_transfer]:
     remote_file_path = f"{remote_unprocessed}/{file_name}"
 
     for command_template in commands:
-        command = command_template.replace("[filename]", file_name)
+        command = command_template.replace("[filename]", remote_file_path)
         remote_command = f"{command}"
         full_ssh_command = ["ssh", remote_host, remote_command]
 
@@ -65,7 +65,7 @@ for file_name in [f.name for f in files_to_transfer]:
         print(f"Success: {file_name}")
 
     # Move the file on remote to processed
-    move_cmd = f"mv {remote_unprocessed}/{file_name} {remote_processed}/{file_name}"
+    move_cmd = f"mv {remote_file_path} {remote_processed}/{file_name}"
     subprocess.run(["ssh", remote_host, move_cmd])
     print(f"Moved {file_name} to processed folder on remote")
 
