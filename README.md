@@ -51,6 +51,7 @@ commands:
 - Files that fail SCP are skipped
 - Remote commands that fail are logged and skipped (but script continues)
 - Output is printed to console for transparency
+- Commands are issued with a hardcoded 5-second delay from one to the next
 
 ## To Run
 
@@ -59,3 +60,6 @@ Make sure your config file is filled out, then run:
 ```bash
 python scp_sync_and_print.py
 ```
+
+## Future Work
+- Declare inter-command sleep duration in config
