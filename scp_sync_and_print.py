@@ -29,6 +29,20 @@ for path in [local_new, local_transferred]:
 files_to_transfer = list(local_new.glob("*.pdf"))
 
 for file in files_to_transfer:
+    dest_local = local_transferred / file.name
+    remote_file_check = f"test -f {remote_unprocessed}/{file.name}"
+
+    # Check for local conflict
+    if dest_local.exists():
+        print(f"[SKIP] File already exists in transferred folder: {dest_local.name}")
+        continue
+
+    # Check for remote conflict
+    result = subprocess.run(["ssh", remote_host, remote_file_check], stdout=subprocess.DEVNULL)
+    if result.returncode == 0:
+        print(f"[SKIP] File already exists in remote unprocessed folder: {file.name}")
+        continue
+
     print(f"Transferring: {file.name}")
 
     # SCP to remote unprocessed folder
@@ -41,13 +55,19 @@ for file in files_to_transfer:
         continue  # Skip to next file
 
     # Move file locally to 'transferred'
-    dest_local = local_transferred / file.name
     file.rename(dest_local)
     print(f"Moved to transferred: {dest_local}")
 
 # Now SSH into remote machine to process files
 for file_name in [f.name for f in files_to_transfer]:
     remote_file_path = f"{remote_unprocessed}/{file_name}"
+    remote_processed_check = f"test -f {remote_processed}/{file_name}"
+
+    # Check if file already exists in remote processed folder
+    result = subprocess.run(["ssh", remote_host, remote_processed_check], stdout=subprocess.DEVNULL)
+    if result.returncode == 0:
+        print(f"[SKIP] File already exists in remote processed folder: {file_name}")
+        continue
 
     for command_template in commands:
         command = command_template.replace("[filename]", remote_file_path)
@@ -68,4 +88,3 @@ for file_name in [f.name for f in files_to_transfer]:
     move_cmd = f"mv {remote_file_path} {remote_processed}/{file_name}"
     subprocess.run(["ssh", remote_host, move_cmd])
     print(f"Moved {file_name} to processed folder on remote")
-
