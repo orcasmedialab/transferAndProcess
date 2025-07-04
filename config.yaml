@@ -1,0 +1,21 @@
+# Local folder containing new files to transfer
+local_new: ""
+
+# Local folder where transferred files are moved to
+local_transferred: ""
+
+# Remote folder where unprocessed files should go
+remote_unprocessed: ""
+
+# Remote folder where files should be moved after processing
+remote_processed: ""
+
+# Remote SSH target (e.g., john@10.0.0.0 or myhost.local)
+remote_host: ""
+
+# List of commands to run for each file on the remote machine
+commands:
+  - "# Commands that begin with '#' are ignored"
+  - "echo Processing [filename]"
+  - "# pdfinfo [filename] | grep Pages"
+

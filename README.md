@@ -1,39 +1,61 @@
 # SCP + Remote Command Automation
 
-This script automates the transfer and processing of PDF files between a Windows and Ubuntu system via SCP and SSH.
+This script automates the transfer and processing of PDF files between a local Windows machine and a remote Ubuntu system via SCP and SSH.
 
 ## What It Does
 
 1. Transfers all `.pdf` files from a specified local folder to a remote Ubuntu folder
 2. Moves transferred files to a local archive directory
-3. Runs one or more commands for each file remotely (e.g., to print)
-4. Moves the file on the remote machine to a “processed” folder
+3. Runs one or more commands for each file remotely (e.g., to print, rename, or inspect)
+4. Moves the file on the remote machine to a "processed" folder
 
 ## Configuration
 
-Edit `config.json` with the following:
+Edit `config.yaml` with the following:
 
-- `local_new`: Local folder with new files (absolute path)
-- `local_transferred`: Where transferred files should be archived locally
-- `remote_unprocessed`: Folder on remote machine to receive files
-- `remote_processed`: Remote archive folder
-- `remote_host`: SSH host (e.g., `john@10.0.0.0`)
-- `commands`: List of shell commands to run remotely, one per file  
-  Use `[filename]` as a placeholder for the actual file name  
-  Lines starting with `#` will be ignored
+```yaml
+local_new: ""             # Local folder with new files
+local_transferred: ""     # Local folder for transferred files
+remote_unprocessed: ""    # Remote folder to receive files
+remote_processed: ""      # Remote folder for processed files
+remote_host: ""           # SSH host (e.g., "john@10.0.0.0")
+commands:
+  - "# Commands that begin with '#' are ignored"
+  - "echo Processing [filename]"
+  - "# pdfinfo [filename] | grep Pages"
+```
+
+- Use `[filename]` as a placeholder for the file name
+- Comment out any command you want to disable with `#`
 
 ## Requirements
 
 - Python 3
 - SSH key-based login between local and remote machine
-- SCP/SSH available in system path
+- `scp` and `ssh` available in your system path
+- Optional: `poppler-utils` (for `pdfinfo` or `pdftotext` examples)
 
-## Example
+## Example Use Cases
 
-To print PDF files remotely:
+Print files, rename them with timestamps, or inspect content:
 
-```json
-"commands": [
-  "echo Processing [filename]".
-  "# pdfinfo [filename] | grep Pages"
-]
+```yaml
+commands:
+  - "# Commands that begin with '#' are ignored"
+  - "echo Processing [filename]"
+  - "# pdfinfo [filename] | grep Pages"
+```
+
+## Notes
+
+- Files that fail SCP are skipped
+- Remote commands that fail are logged and skipped (but script continues)
+- Output is printed to console for transparency
+
+## To Run
+
+Make sure your config file is filled out, then run:
+
+```bash
+python scp_sync_and_print.py
+```

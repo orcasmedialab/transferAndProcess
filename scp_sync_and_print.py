@@ -2,15 +2,15 @@
 
 import os
 import time
-import json
+import yaml
 import subprocess
 from pathlib import Path
 
 # Load configuration
-CONFIG_PATH = "config.json"
+CONFIG_PATH = "config.yaml"
 
 with open(CONFIG_PATH, "r") as f:
-    config = json.load(f)
+    config = yaml.safe_load(f)
 
 local_new = Path(config["local_new"])
 local_transferred = Path(config["local_transferred"])
